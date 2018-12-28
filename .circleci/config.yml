@@ -83,6 +83,7 @@ jobs:
       - run: yarn run ci
       - run: yarn run example:build:prod
       - run: yarn run example:test --watch=false
+      - run: yarn run example:cypress:ci
       - save_cache:
           key: *cache_key
           paths:
@@ -97,7 +98,7 @@ jobs:
           path: ~/docs
       - restore_cache:
           key: *docs_cache_key
-      - run: yarn setup 
+      - run: yarn setup
       - run: npm rebuild node-sass
       - run: yarn build-for next --progress false && yarn copy-404-page
       - run: cp -rf src/extra-files/next/. dist/ngrx.io/
@@ -132,12 +133,11 @@ jobs:
             echo 'export SHORT_GIT_HASH=$(git rev-parse --short $CIRCLE_SHA1)' >> $BASH_ENV
             echo 'export CIRCLE_PULL_REQUEST_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | cut -d"/" -f7)' >> $BASH_ENV
             source $BASH_ENV
-      - run: yarn setup 
+      - run: yarn setup
       - run: npm rebuild node-sass
       - run: yarn build-for next --progress false --base-href /pr$CIRCLE_PULL_REQUEST_NUMBER-$SHORT_GIT_HASH/ --output-path dist/ngrx.io/pr$CIRCLE_PULL_REQUEST_NUMBER-$SHORT_GIT_HASH/ && yarn copy-404-page
       - run: cp -rf src/extra-files/next/. dist/ngrx.io/pr$CIRCLE_PULL_REQUEST_NUMBER-$SHORT_GIT_HASH/
       - run: yarn --cwd ../../ install && yarn --cwd ../../ run deploy:preview
-      
 
   deploy:
     <<: *run_in_node
